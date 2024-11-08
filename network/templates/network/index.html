@@ -2,7 +2,7 @@
 
 {% block body %}
     <div class="container mt-4">
-        <h2>Create a new post</h2>
+        <h2>New post</h2>
         <form action="{% url 'network:new_post' %}" method="post">
             {% csrf_token %}
             <div class"form-group">
