@@ -12,6 +12,9 @@ class Post(models.Model):
     likes = models.ManyToManyField(User, related_name="liked_posts", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
+    class Meta:
+        ordering = ["-created_at"]
+    
     
 class Follow(models.Model):
     follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name="following")
