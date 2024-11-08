@@ -10,7 +10,7 @@ from .models import User, Post, Follow, Comment
 
 
 def index(request):
-    posts = Post.objects.all
+    posts = Post.objects.all()
     return render(request, "network/index.html", {
         "form": NewPostForm(), 
         "posts": posts
@@ -79,5 +79,8 @@ def new_post(request):
             return redirect("network:index")
     else:
         form = NewPostForm()
-    
-    return HttpResponse(status = 200)
+        
+    return render(request, "network/index.html", {
+        "form": form,
+        "posts": Post.objects.all()
+    })
