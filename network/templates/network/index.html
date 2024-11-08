@@ -1,5 +1,28 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    TODO
+    <div class="container mt-4">
+        <h2>Create a new post</h2>
+        <form action="{% url 'network:new_post' %}" method="post">
+            {% csrf_token %}
+            <div class"form-group">
+                {{ form.as_p }}
+            </div>
+            <button type="submit" class="btn btn-primary">Post</button>
+        </form>
+
+        <hr>
+
+        {% for post in posts %}
+            <div class="post mb-3 p-3 border rounder">
+                <div class="d-flex justify-content-between">
+                    <span><strong>{{  post.user.username }}</strong></span>
+                    <span class="text-muted">{{ post.created_at|date:"F j, Y, g:i a"}}</span>
+                </div>
+                <p>{{ post.content }}</p>
+            </div>
+            {% empty %}
+                <p>No posts yet.</p>
+        {% endfor %}
+    </div>
 {% endblock %}

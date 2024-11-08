@@ -1,14 +1,20 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
+from .forms import NewPostForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from .models import User
+from .models import User, Post, Follow, Comment
 
 
 def index(request):
-    return render(request, "network/index.html")
+    posts = Post.objects.all
+    return render(request, "network/index.html", {
+        "form": NewPostForm(), 
+        "posts": posts
+    })
 
 
 def login_view(request):
@@ -61,3 +67,17 @@ def register(request):
         return redirect("network:index")
     else:
         return render(request, "network/register.html")
+
+@login_required
+def new_post(request):
+    if request.method == "POST":
+        form = NewPostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.user = request.user
+            post.save()
+            return redirect("network:index")
+    else:
+        form = NewPostForm()
+    
+    return HttpResponse(status = 200)
