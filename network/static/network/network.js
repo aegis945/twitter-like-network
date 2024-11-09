@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
+    handleLikeButton();
+});
+
+function handleLikeButton() {
     document.querySelectorAll('.like-btn').forEach(button => {
         button.addEventListener('click', () => {
             const postId = button.dataset.postId;
@@ -43,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
-});
+}
 
 function getCookie(name) {
     let cookieValue = null;
