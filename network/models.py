@@ -9,11 +9,15 @@ class User(AbstractUser):
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
-    likes = models.PositiveIntegerField(default=0)
+    likes = models.ManyToManyField(User, related_name="liked_posts", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         ordering = ["-created_at"]
+    
+    @property    
+    def like_count(self):
+        return self.likes.count()
     
     
 class Follow(models.Model):
@@ -29,7 +33,7 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     content = models.TextField()
-    likes = models.PositiveIntegerField(default=0)
+    likes = models.ManyToManyField(User, related_name="liked_comments", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
