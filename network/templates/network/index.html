@@ -15,54 +15,57 @@
         </form>
 
         <hr>
-
-        {% for post in page_obj.object_list %}
-            <div class="post mb-3 p-3 border rounded">
-                <div class="d-flex justify-content-between">
-                    <span><strong>{{  post.user.username }}</strong></span>
-                    <span class="text-muted">{{ post.created_at|date:"F j, Y, g:i a"}}</span>
+        <div id="posts-container">
+            {% for post in page_obj.object_list %}
+                <div class="post mb-3 p-3 border rounded">
+                    <div class="d-flex justify-content-between">
+                        <span><strong>{{  post.user.username }}</strong></span>
+                        <span class="text-muted">{{ post.created_at|date:"F j, Y, g:i a"}}</span>
+                    </div>
+                    <p>{{ post.content }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        {% if user.is_authenticated %}
+                            <button class="btn btn-sm {% if user in post.likes.all %}text-danger{% else %}text-muted{% endif %} like-btn" data-post-id="{{ post.id }}">
+                                <i class="bi fs-4 {% if user in post.likes.all %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+                            </button>
+                        {% endif %}
+                            <span class="like-count">{{ post.like_count }} likes</span>
+                    </div>
                 </div>
-                <p>{{ post.content }}</p>
-                <div class="d-flex justify-content-between align-items-center">
-                    {% if user.is_authenticated %}
-                        <button class="btn btn-sm {% if user in post.likes.all %}text-danger{% else %}text-muted{% endif %} like-btn" data-post-id="{{ post.id }}">
-                            <i class="bi fs-4 {% if user in post.likes.all %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
-                        </button>
+                {% empty %}
+                    <p>No posts yet.</p>
+            {% endfor %}
+        </div>
+
+        <div class="d-none d-lg-block">
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">&laquo; First</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                        </li>
                     {% endif %}
-                        <span class="like-count">{{ post.like_count }} likes</span>
-                </div>
-            </div>
-            {% empty %}
-                <p>No posts yet.</p>
-        {% endfor %}
 
-        <nav class="mt-4">
-            <ul class="pagination justify-content-center">
-                {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page=1">&laquo; First</a>
+                    <li class="page-item active">
+                        <span class="page-link">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                        </span>
                     </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-                    </li>
-                {% endif %}
 
-                <li class="page-item active">
-                    <span class="page-link">
-                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-                    </span>
-                </li>
-
-                {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
     </div>
     {% block script %}
         <script src="{% static 'network/network.js' %}"></script>
