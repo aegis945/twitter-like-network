@@ -19,7 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(data => {
                 if (data.success) {
-                    button.textContent = data.liked ? 'Unlike' : 'Like';
+                    if (data.liked) {
+                        button.textContent = 'Unlike';
+                        button.classList.remove('btn-outline-primary');
+                        button.classList.add('btn-outline-danger');
+                    } else {
+                        button.textContent = 'Like';
+                        button.classList.remove('btn-outline-danger');
+                        button.classList.add('btn-outline-primary');
+                    }
                     const likeCountSpan = button.nextElementSibling;
                     likeCountSpan.textContent = `${data.like_count} likes`;
                 } else {

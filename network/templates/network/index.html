@@ -3,13 +3,15 @@
 
 {% block body %}
     <div class="container mt-4">
-        <h2>New post</h2>
-        <form action="{% url 'network:new_post' %}" method="post">
-            {% csrf_token %}
-            <div class="form-group">
-                {{ form.as_p }}
-            </div>
-            <button type="submit" class="btn btn-primary">Post</button>
+        {% if user.is_authenticated %}
+            <h2>New post</h2>
+            <form action="{% url 'network:new_post' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ form.as_p }}
+                </div>
+                <button type="submit" class="btn btn-primary">Post</button>
+            {% endif %}
         </form>
 
         <hr>
@@ -30,10 +32,8 @@
                                 Like
                             {% endif %}
                         </button>
-                        <span class="like-count">{{ post.like_count }} likes</span>
-                    {% else %}
-                        <span class="text-muted">Log in to like posts</span>
                     {% endif %}
+                        <span class="like-count">{{ post.like_count }} likes</span>
                 </div>
             </div>
             {% empty %}
