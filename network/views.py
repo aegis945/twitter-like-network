@@ -123,7 +123,27 @@ def toggle_like(request, post_id):
         liked = True
 
     return JsonResponse({
-        'success': True,
-        'liked': liked,
-        'like_count': post.like_count
+        "success": True,
+        "liked": liked,
+        "like_count": post.like_count
+    })
+    
+@login_required
+def profile(request, username):
+    user_profile = get_object_or_404(User, username=username)
+    followers_count = user_profile.followed_by.count()
+    following_count = user_profile.following.count()
+    is_following = request.user.following.filter(following=user_profile).exists()
+    
+    posts = user_profile.post_set.all()
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, "network/profile.html", {
+        "user_profile": user_profile,
+        "followers_count": followers_count,
+        "following_count": following_count,
+        "is_following": is_following,
+        "page_obj": page_obj
     })
