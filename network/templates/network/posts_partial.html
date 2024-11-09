@@ -1,0 +1,17 @@
+{% for post in page_obj.object_list %}
+    <div class="post mb-3 p-3 border rounded">
+        <div class="d-flex justify-content-between">
+            <span><strong>{{ post.user.username }}</strong></span>
+            <span class="text-muted">{{ post.created_at|date:"F j, Y, g:i a" }}</span>
+        </div>
+        <p>{{ post.content }}</p>
+        <div class="d-flex justify-content-between align-items-center">
+            {% if user.is_authenticated %}
+                <button class="btn btn-sm {% if user in post.likes.all %}text-danger{% else %}text-muted{% endif %} like-btn" data-post-id="{{ post.id }}">
+                    <i class="bi fs-4 {% if user in post.likes.all %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+                </button>
+            {% endif %}
+            <span class="like-count">{{ post.like_count }} likes</span>
+        </div>
+    </div>
+{% endfor %}

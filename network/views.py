@@ -5,6 +5,7 @@ from django.db import IntegrityError
 from .forms import NewPostForm
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_protect
 
@@ -17,12 +18,28 @@ def index(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        return render(request, "network/posts_partial.html", {"page_obj": page_obj})
+
     return render(request, "network/index.html", {
         "form": NewPostForm(), 
         "page_obj": page_obj
     })
 
 
+def posts(request):
+    posts = Post.objects.all()
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    html = render_to_string("network/posts_partial.html", {"page_obj": page_obj}, request=request)
+
+    return JsonResponse({
+        "html": html,
+        "has_next": page_obj.has_next()
+    })
+    
 def login_view(request):
     if request.method == "POST":
 

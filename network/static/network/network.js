@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     handleLikeButton();
+    infiniteScroll()
 });
 
 function handleLikeButton() {
@@ -62,4 +63,42 @@ function getCookie(name) {
         }
     }
     return cookieValue;
+}
+
+function infiniteScroll() {
+    let page = 2;
+    let loading = false;
+    const isMobile = () => window.innerWidth <= 991;
+
+    window.onscroll = () => {
+        if (!isMobile() || loading) return;
+
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+            loading = true;
+            fetch(`/posts/?page=${page}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.querySelector('#posts-container').insertAdjacentHTML('beforeend', data.html);
+                    if (data.has_next) {
+                        page++;
+                        loading = false;
+                    } else {
+                        window.onscroll = null;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading posts:", error);
+                    loading = false;
+                });
+        }
+    };
 }
