@@ -19,14 +19,17 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(data => {
                 if (data.success) {
+                    const icon = button.querySelector('i');
                     if (data.liked) {
-                        button.textContent = 'Unlike';
-                        button.classList.remove('btn-outline-primary');
-                        button.classList.add('btn-outline-danger');
+                        icon.classList.remove('bi-heart');
+                        icon.classList.add('bi-heart-fill');
+                        button.classList.remove('text-muted');
+                        button.classList.add('text-danger');
                     } else {
-                        button.textContent = 'Like';
-                        button.classList.remove('btn-outline-danger');
-                        button.classList.add('btn-outline-primary');
+                        icon.classList.remove('bi-heart-fill');
+                        icon.classList.add('bi-heart');
+                        button.classList.remove('text-danger');
+                        button.classList.add('text-muted');
                     }
                     const likeCountSpan = button.nextElementSibling;
                     likeCountSpan.textContent = `${data.like_count} likes`;

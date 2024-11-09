@@ -25,12 +25,8 @@
                 <p>{{ post.content }}</p>
                 <div class="d-flex justify-content-between align-items-center">
                     {% if user.is_authenticated %}
-                        <button class="btn btn-sm btn-outline-primary like-btn" data-post-id="{{ post.id }}">
-                            {% if user in post.likes.all %}
-                                Unlike
-                            {% else %}
-                                Like
-                            {% endif %}
+                        <button class="btn btn-sm {% if user in post.likes.all %}text-danger{% else %}text-muted{% endif %} like-btn" data-post-id="{{ post.id }}">
+                            <i class="bi fs-4 {% if user in post.likes.all %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
                         </button>
                     {% endif %}
                         <span class="like-count">{{ post.like_count }} likes</span>
