@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.db import IntegrityError
 from .forms import NewPostForm
 from django.http import JsonResponse
@@ -12,9 +13,13 @@ from .models import User, Post, Follow, Comment
 
 def index(request):
     posts = Post.objects.all()
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    
     return render(request, "network/index.html", {
         "form": NewPostForm(), 
-        "posts": posts
+        "page_obj": page_obj
     })
 
 
