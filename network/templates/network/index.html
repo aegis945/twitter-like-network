@@ -1,11 +1,12 @@
 {% extends "network/layout.html" %}
+{% load static %}
 
 {% block body %}
     <div class="container mt-4">
         <h2>New post</h2>
         <form action="{% url 'network:new_post' %}" method="post">
             {% csrf_token %}
-            <div class"form-group">
+            <div class="form-group">
                 {{ form.as_p }}
             </div>
             <button type="submit" class="btn btn-primary">Post</button>
@@ -14,15 +15,32 @@
         <hr>
 
         {% for post in posts %}
-            <div class="post mb-3 p-3 border rounder">
+            <div class="post mb-3 p-3 border rounded">
                 <div class="d-flex justify-content-between">
                     <span><strong>{{  post.user.username }}</strong></span>
                     <span class="text-muted">{{ post.created_at|date:"F j, Y, g:i a"}}</span>
                 </div>
                 <p>{{ post.content }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    {% if user.is_authenticated %}
+                        <button class="btn btn-sm btn-outline-primary like-btn" data-post-id="{{ post.id }}">
+                            {% if user in post.likes.all %}
+                                Unlike
+                            {% else %}
+                                Like
+                            {% endif %}
+                        </button>
+                        <span class="like-count">{{ post.like_count }} likes</span>
+                    {% else %}
+                        <span class="text-muted">Log in to like posts</span>
+                    {% endif %}
+                </div>
             </div>
             {% empty %}
                 <p>No posts yet.</p>
         {% endfor %}
     </div>
+    {% block script %}
+        <script src="{% static 'network/network.js' %}"></script>
+    {% endblock %}
 {% endblock %}
