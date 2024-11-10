@@ -14,6 +14,9 @@ class Post(models.Model):
     
     class Meta:
         ordering = ["-created_at"]
+        
+    def __str__(self):
+        return f"Post by {self.user}. Created at {self.created_at}"
     
     @property    
     def like_count(self):
@@ -37,7 +40,7 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        ordering = ["-created_at"],
+        ordering = ["-created_at"]
         indexes = [
             models.Index(fields=["created_at"])
         ]
