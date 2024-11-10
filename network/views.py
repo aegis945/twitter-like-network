@@ -25,20 +25,6 @@ def index(request):
         "form": NewPostForm(), 
         "page_obj": page_obj
     })
-
-
-def posts(request):
-    posts = Post.objects.all()
-    paginator = Paginator(posts, 10)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
-
-    html = render_to_string("network/posts_partial.html", {"page_obj": page_obj}, request=request)
-
-    return JsonResponse({
-        "html": html,
-        "has_next": page_obj.has_next()
-    })
     
 def login_view(request):
     if request.method == "POST":
