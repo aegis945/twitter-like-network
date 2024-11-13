@@ -31,7 +31,7 @@
                                 <i class="bi fs-4 {% if user in post.likes.all %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
                             </button>
                         {% endif %}
-                            <span class="like-count">{{ post.like_count }} likes</span>
+                            <span class="like-count">{{ post.like_count }} {% if post.like_count == 1 %}like{% else %}likes{% endif %}</span>
                     </div>
                 </div>
                 {% empty %}

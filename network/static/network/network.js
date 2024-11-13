@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     handleLikeButton();
+    handleFollowButton();
 });
 
 function handleLikeButton() {
@@ -47,6 +48,53 @@ function handleLikeButton() {
             });
         });
     });
+}
+
+function handleFollowButton() {
+    const followButton = document.querySelector('#follow-btn');
+
+    if (followButton) {
+        followButton.addEventListener('click', () => {
+            const username = followButton.dataset.username;
+            const csrftoken = getCookie('csrftoken');
+
+            fetch(`/toggle_follow/${username}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    if (data.following) {
+                        followButton.textContent = 'Unfollow';
+                        followButton.classList.remove('btn-primary');
+                        followButton.classList.add('btn-danger');
+                    } else {
+                        followButton.textContent = 'Follow';
+                        followButton.classList.remove('btn-danger');
+                        followButton.classList.add('btn-primary');
+                    }
+
+                    const followersCountElement = document.querySelector('div.mx-2 span');
+                    followersCountElement.textContent = data.followers_count;
+                } else {
+                    alert('Error: ' + (data.message || 'Something went wrong.'));
+                }
+            })
+            .catch(error => {
+                console.error('Error during fetch:', error);
+                alert('An error occurred while processing your request.');
+            });
+        });
+    }
 }
 
 function getCookie(name) {

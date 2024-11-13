@@ -114,12 +114,14 @@ def toggle_like(request, post_id):
         "like_count": post.like_count
     })
     
-@login_required
 def profile(request, username):
     user_profile = get_object_or_404(User, username=username)
     followers_count = user_profile.followed_by.count()
     following_count = user_profile.following.count()
-    is_following = request.user.following.filter(following=user_profile).exists()
+    is_following = False
+    
+    if request.user.is_authenticated:
+        is_following = request.user.following.filter(following=user_profile).exists()
     
     posts = user_profile.post_set.all()
     paginator = Paginator(posts, 10)
@@ -133,3 +135,28 @@ def profile(request, username):
         "is_following": is_following,
         "page_obj": page_obj
     })
+    
+@login_required
+def toggle_follow(request, username):
+    if request.method == "POST":
+        user_to_follow = get_object_or_404(User, username=username)
+        
+        if request.user == user_to_follow:
+            return JsonResponse({"success": False, "message": "You cannot follow yourself."}, status=400)
+        
+        if request.user.following.filter(following=user_to_follow).exists():
+            request.user.following.filter(following=user_to_follow).delete()
+            following = False
+        else:
+            Follow.objects.create(follower=request.user, following=user_to_follow)
+            following = True
+            
+        followers_count = user_to_follow.followed_by.count()
+        
+        return JsonResponse({
+            "success": True,
+            "following": following,
+            "followers_count": followers_count
+        })
+        
+    return JsonResponse({"success": False,"message": "Invalid request method."},status=405) 
