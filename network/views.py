@@ -8,6 +8,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_protect
+import json
 
 from .models import User, Post, Follow, Comment
 
@@ -174,3 +175,22 @@ def following(request):
         "page_obj": page_obj,
         "form": NewPostForm(),
     })
+    
+@login_required
+def edit_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    
+    if post.user != request.user:
+        return JsonResponse({"success": False, "message": "You are not authorized to edit this post."}, status=403)
+    
+    if request.method == "POST":
+        data = json.loads(request.body)
+        content = data.get("content")
+        if content:
+            post.content = content
+            post.save()
+            return JsonResponse({"success": True, "message": "Post updated successfully."})
+        else:
+            return JsonResponse({"success": False, "message": "No content provided."})
+        
+    return JsonResponse({"success": False, "message": "Invalid request method."}, status=405)

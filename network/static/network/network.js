@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     handleLikeButton();
     handleFollowButton();
+    handleEditButton();
 });
 
 function handleLikeButton() {
@@ -95,6 +96,61 @@ function handleFollowButton() {
             });
         });
     }
+}
+
+function handleEditButton() {
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const postId = button.dataset.postId;
+            const postContentElement = document.querySelector(`#content-text-${postId}`);
+            const postEditElement = document.querySelector(`#edit-content-${postId}`);
+
+            postContentElement.style.display = 'none';
+            postEditElement.style.display = 'block';
+
+            const editTextArea = document.querySelector(`#edit-textarea-${postId}`);
+            editTextArea.value = postContentElement.textContent;
+
+            document.querySelector(`.save-btn[data-post-id="${postId}"]`).addEventListener('click', () => {
+                savePostEdit(postId, editTextArea.value);
+            });
+
+            document.querySelector(`.cancel-btn[data-post-id="${postId}"]`).addEventListener('click', () => {
+                postContentElement.style.display = 'block';
+                postEditElement.style.display = 'none';
+            });
+        });
+    });
+}
+
+function savePostEdit(postId, updatedContent) {
+    const csrftoken = getCookie('csrftoken');
+
+    fetch(`/edit_post/${postId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify({content: updatedContent})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const postContentElement = document.querySelector(`#content-text-${postId}`);
+            const postEditElement = document.querySelector(`#edit-content-${postId}`);
+
+            postContentElement.textContent = updatedContent;
+            postContentElement.style.display = 'block';
+            postEditElement.style.display = 'none';
+        } else {
+            alert('Error: ' + (data.message || 'Something went wrong.'));
+        }
+    })
+    .catch(error => {
+        console.error('Error during fetch:', error);
+        alert('An error occurred while saving your post.');
+    });
 }
 
 function getCookie(name) {
