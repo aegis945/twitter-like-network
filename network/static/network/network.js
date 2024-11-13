@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     handleLikeButton();
     handleFollowButton();
     handleEditButton();
+    handleDeleteButton();
 });
 
 function handleLikeButton() {
@@ -150,6 +151,51 @@ function savePostEdit(postId, updatedContent) {
     .catch(error => {
         console.error('Error during fetch:', error);
         alert('An error occurred while saving your post.');
+    });
+}
+
+function handleDeleteButton() {
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            const postId = button.dataset.postId;
+            if (confirm("Are you sure you want to delete this post?")) {
+                deletePost(postId)
+            }
+        });
+    });
+}
+
+function deletePost(postId) {
+    const csrftoken = getCookie('csrftoken');
+
+    fetch(`/delete_post/${postId}/`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const postElement = document.querySelector(`#content-${postId}`).closest('.post');
+            postElement.classList.add('fade');
+            setTimeout(() => {
+                postElement.remove();
+                const postsContainer = document.querySelector('#posts-container');
+                if (postsContainer.children.length === 0) {
+                    const noPostsMessage = document.createElement('p');
+                    noPostsMessage.textContent = 'No posts yet.';
+                    postsContainer.appendChild(noPostsMessage);
+                }
+            }, 300);
+        } else {
+            alert('Error: ' + (data.message || 'Something went wrong.'));
+        }
+    })
+    .catch(error => {
+        console.error('Error during fetch:', error);
+        alert('An error occurred while deleting your post.');
     });
 }
 
